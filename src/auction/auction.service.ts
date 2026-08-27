@@ -1,10 +1,13 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Auction } from './entities/auction.entity';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class AuctionService {
@@ -18,8 +21,8 @@ export class AuctionService {
       const date = new Date();
       createAuctionDto.endDate = date;
       createAuctionDto.endDate.setDate(date.getDate() + 3);
-    }else if(createAuctionDto.endDate < new Date()){
-      throw new ConflictException("invalid Date")
+    } else if (createAuctionDto.endDate < new Date()) {
+      throw new ConflictException('invalid Date');
     }
     const auction = this.auction.create(createAuctionDto);
     auction.sellerId = 'e485262b-24b2-4f2f-a96e-575197330fc8';
@@ -31,11 +34,15 @@ export class AuctionService {
   }
 
   findOne(id: string) {
-    return this.auction.findBy({id});
+    return this.auction.findBy({ id });
   }
 
-  update(id: number, updateAuctionDto: UpdateAuctionDto) {
-    return `This action updates a #${id} auction`;
+  async update(id: string, updateAuctionDto: UpdateAuctionDto) {
+    const auction = await this.auction.findOneBy({ id });
+    if (!auction)
+      throw new NotFoundException(`Auction with id ${id} not found`);
+
+    return this.auction.update(id, updateAuctionDto);
   }
 
   remove(id: number) {

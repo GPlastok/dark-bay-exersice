@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { OfferService } from './offer.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
@@ -7,9 +15,13 @@ import { UpdateOfferDto } from './dto/update-offer.dto';
 export class OfferController {
   constructor(private readonly offerService: OfferService) {}
 
+  // NOTE: REMOVE HARDCODED VALUE (for iser id)
   @Post()
   create(@Body() createOfferDto: CreateOfferDto) {
-    return this.offerService.create(createOfferDto);
+    return this.offerService.create(
+      createOfferDto,
+      'e485262b-24b2-4f2f-a96e-575197330fc8',
+    );
   }
 
   @Get()

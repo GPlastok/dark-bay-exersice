@@ -6,11 +6,10 @@ import {
   SwaggerDocumentOptions,
 } from '@nestjs/swagger';
 
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-   app.useGlobalPipes(
+  app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
@@ -28,13 +27,12 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Cyber Chat API')
-    .setDescription('Threads, user, and comments')
+    .setTitle('Dark Bay API')
+    .setDescription('Buy and sell stuff through an API. How cool is that?')
     .setVersion('1.0')
     .addTag('users', 'Operations related to user management') // Define tag metadata
-    .addTag('auth', 'Authentication and authorization routes')
-    .addTag('threads', 'Operations related to threads management')
-    .addTag('comments', 'Operations related to comments management')
+    .addTag('auction', 'Operations related to auction management')
+    .addTag('offers', 'Operations related to offers management')
     .addBearerAuth(
       {
         type: 'http',

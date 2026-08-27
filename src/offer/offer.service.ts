@@ -1,11 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Offer } from './entities/offer.entity';
+import { Auction } from 'src/auction/entities/auction.entity';
+import { Repository } from 'typeorm';
+import { AuctionService } from 'src/auction/auction.service';
 
 @Injectable()
 export class OfferService {
-  create(createOfferDto: CreateOfferDto) {
-    return 'This action adds a new offer';
+  constructor(
+    @InjectRepository(Offer)
+    private readonly offers: Repository<Offer>,
+    @InjectRepository(Auction)
+    private readonly auctions: Repository<Auction>,
+    private readonly auctionService: AuctionService,
+  ) {}
+  //
+
+  // CHECK FOR REFACTOR NEED (relation of auntion update)
+  async create(createOfferDto: CreateOfferDto, bidderId: string) {
+    const auction = await this.auctions.findOneBy({
+      id: createOfferDto.auctionId,
+    });
+    if (!auction)
+      throw new NotFoundException(
+        `Auction with id ${createOfferDto.auctionId} not found.`,
+      );
+    if (auction.endDate < new Date())
+      throw new ConflictException('Auction is closed');
+    const currentPrice = auction.currentPrice
+      ? auction.currentPrice
+      : auction.sellingPrice;
+    if (currentPrice >= createOfferDto.biddingPrice)
+      throw new ConflictException(
+        `Your bid was lower than the current price and could not be placed. Please bid more than ${currentPrice}`,
+      );
+    const offer = this.offers.create({ ...createOfferDto, bidderId });
+    const saved = await this.offers.save(offer);
+
+    if (saved.id) {
+      await this.auctionService.update(auction.id, {
+        currentPrice: offer.biddingPrice,
+      });
+    }
+
+    return saved;
   }
 
   findAll() {
