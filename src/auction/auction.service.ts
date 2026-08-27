@@ -1,11 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Auction } from './entities/auction.entity';
 
 @Injectable()
 export class AuctionService {
+  constructor(
+    @InjectRepository(Auction)
+    private readonly auction: Repository<Auction>,
+  ) {}
+
   create(createAuctionDto: CreateAuctionDto) {
-    return 'This action adds a new auction';
+    if (createAuctionDto.endDate == undefined) {
+      const date = new Date();
+      createAuctionDto.endDate = date;
+      createAuctionDto.endDate.setDate(date.getDate() + 3);
+    }
+    const auction = this.auction.create(createAuctionDto);
+    auction.sellerId = 'e485262b-24b2-4f2f-a96e-575197330fc8';
+    return this.auction.save(auction);
   }
 
   findAll() {

@@ -14,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
       type: 'better-sqlite3',
       database: 'data/dark-bay.sqlite',
       entities: [],
+      autoLoadEntities: true,
       synchronize: true,
       logging: false,
       enableWAL: true,
