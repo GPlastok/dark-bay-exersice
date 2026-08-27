@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, SerializeOptions } from '@nestjs/common';
 import { AuctionService } from './auction.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
+import{AuctionResponseDto} from './dto/auction-response.dto'
+
 
 @Controller('auction')
 export class AuctionController {
@@ -13,13 +15,14 @@ export class AuctionController {
   }
 
   @Get()
+  @SerializeOptions({type: AuctionResponseDto})
   findAll() {
     return this.auctionService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.auctionService.findOne(+id);
+    return this.auctionService.findOne(id);
   }
 
   @Patch(':id')

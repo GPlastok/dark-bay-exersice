@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Auction } from './entities/auction.entity';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class AuctionService {
@@ -17,6 +18,8 @@ export class AuctionService {
       const date = new Date();
       createAuctionDto.endDate = date;
       createAuctionDto.endDate.setDate(date.getDate() + 3);
+    }else if(createAuctionDto.endDate < new Date()){
+      throw new ConflictException("invalid Date")
     }
     const auction = this.auction.create(createAuctionDto);
     auction.sellerId = 'e485262b-24b2-4f2f-a96e-575197330fc8';
@@ -24,11 +27,11 @@ export class AuctionService {
   }
 
   findAll() {
-    return `This action returns all auction`;
+    return this.auction.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auction`;
+  findOne(id: string) {
+    return this.auction.findBy({id});
   }
 
   update(id: number, updateAuctionDto: UpdateAuctionDto) {
