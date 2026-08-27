@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  SerializeOptions,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { OfferService } from './offer.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
+import { OfferResponseDto } from './dto/offer-response.dto';
 
 @Controller('offer')
 export class OfferController {
@@ -25,17 +28,22 @@ export class OfferController {
   }
 
   @Get()
+  @SerializeOptions({ type: OfferResponseDto })
   findAll() {
     return this.offerService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.offerService.findOne(+id);
+  @SerializeOptions({ type: OfferResponseDto })
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.offerService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateOfferDto: UpdateOfferDto,
+  ) {
     return this.offerService.update(+id, updateOfferDto);
   }
 

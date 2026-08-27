@@ -8,12 +8,18 @@ import { UpdateAuctionDto } from './dto/update-auction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Auction } from './entities/auction.entity';
+import { Offer } from 'src/offer/entities/offer.entity';
+import { privateDecrypt } from 'crypto';
+import { AuctionResponseDto } from './dto/auction-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuctionService {
   constructor(
     @InjectRepository(Auction)
     private readonly auction: Repository<Auction>,
+    @InjectRepository(Offer)
+    private readonly offer: Repository<Offer>,
   ) {}
 
   create(createAuctionDto: CreateAuctionDto) {
@@ -33,8 +39,13 @@ export class AuctionService {
     return this.auction.find();
   }
 
-  findOne(id: string) {
-    return this.auction.findBy({ id });
+  async findOne(id: string): Promise<Partial<AuctionResponseDto>> {
+    const auctionres = await this.auction.findBy({ id });
+    if (!auctionres)
+      throw new NotFoundException(`Auction with id ${id} not found`);
+    const offers = await this.offer.find({ where: { auctionId: id } });
+   // const auctionOffer: AuctionResponseDto = { ...auctionres, offers };
+    return plainToInstance(AuctionResponseDto, { ...auctionres, offers });
   }
 
   async update(id: string, updateAuctionDto: UpdateAuctionDto) {

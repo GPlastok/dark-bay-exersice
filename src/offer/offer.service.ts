@@ -53,11 +53,11 @@ export class OfferService {
   }
 
   findAll() {
-    return `This action returns all offer`;
+    return this.offers.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} offer`;
+  findOne(id: string) {
+    return this.offers.findOneBy({id});
   }
 
   update(id: number, updateOfferDto: UpdateOfferDto) {

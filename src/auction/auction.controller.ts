@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   SerializeOptions,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { AuctionService } from './auction.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
@@ -29,12 +30,16 @@ export class AuctionController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.auctionService.findOne(id);
+  //@SerializeOptions({ type: AuctionResponseDto })
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.auctionService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuctionDto: UpdateAuctionDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateAuctionDto: UpdateAuctionDto,
+  ) {
     return this.auctionService.update(id, updateAuctionDto);
   }
 
