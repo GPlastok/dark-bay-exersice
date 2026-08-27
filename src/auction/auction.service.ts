@@ -12,6 +12,7 @@ import { Offer } from 'src/offer/entities/offer.entity';
 import { privateDecrypt } from 'crypto';
 import { AuctionResponseDto } from './dto/auction-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { PaginationMeta, PaginationQueryDto } from 'src/common/dto/paging.dto';
 
 @Injectable()
 export class AuctionService {
@@ -35,8 +36,30 @@ export class AuctionService {
     return this.auction.save(auction);
   }
 
-  findAll() {
-    return this.auction.find();
+  async findAll(paginationQueryDto: PaginationQueryDto): Promise<{
+    data: AuctionResponseDto[];
+    meta: PaginationMeta;
+  }> {
+    const { page, limit } = paginationQueryDto;
+
+    const [data, total] = await this.auction.findAndCount({
+      order: { endDate: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    const auctionData: AuctionResponseDto[] = plainToInstance(
+      AuctionResponseDto,
+      data,
+    );
+    return {
+      data: auctionData,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPage: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string): Promise<Partial<AuctionResponseDto>> {
@@ -44,8 +67,8 @@ export class AuctionService {
     if (!auctionres)
       throw new NotFoundException(`Auction with id ${id} not found`);
     const offers = await this.offer.find({ where: { auctionId: id } });
-   // const auctionOffer: AuctionResponseDto = { ...auctionres, offers };
-   //auctionres.offers = offers; 
+    // const auctionOffer: AuctionResponseDto = { ...auctionres, offers };
+    //auctionres.offers = offers;
     return plainToInstance(AuctionResponseDto, { ...auctionres, offers });
   }
 

@@ -8,11 +8,13 @@ import {
   Delete,
   SerializeOptions,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { AuctionService } from './auction.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
 import { AuctionResponseDto } from './dto/auction-response.dto';
+import { PaginationQueryDto } from 'src/common/dto/paging.dto';
 
 @Controller('auction')
 export class AuctionController {
@@ -24,9 +26,8 @@ export class AuctionController {
   }
 
   @Get()
-  @SerializeOptions({ type: AuctionResponseDto })
-  findAll() {
-    return this.auctionService.findAll();
+  findAll(@Query() paging: PaginationQueryDto) {
+    return this.auctionService.findAll(paging);
   }
 
   @Get(':id')
