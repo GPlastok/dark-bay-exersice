@@ -1,3 +1,4 @@
+import { Options } from '@nestjs/common';
 import { Expose, Type } from 'class-transformer';
 import { OfferResponseDto } from 'src/offer/dto/offer-response.dto';
 
@@ -26,5 +27,6 @@ export class AuctionResponseDto {
   createdAt: Date;
 
   @Expose()
+  @Type(() => OfferResponseDto)
   offers: OfferResponseDto[];
 }

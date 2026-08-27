@@ -1,3 +1,4 @@
+import { Offer } from 'src/offer/entities/offer.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -5,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -36,4 +38,7 @@ export class Auction {
 
   @CreateDateColumn({ type: 'datetime' })
   createdAt: Date;
+
+  @OneToMany(() => Offer, (offer) => offer.auction)
+  offers: Offer[];
 }

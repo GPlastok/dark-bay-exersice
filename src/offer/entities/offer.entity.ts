@@ -25,7 +25,7 @@ export class Offer {
 
   @Column({ type: 'varchar' })
   auctionId: string;
-  @ManyToOne(() => Auction, { nullable: false })
+  @ManyToOne(() => Auction, (auction) => auction.offers, { nullable: false })
   @JoinColumn({ name: 'auctionId' })
   auction: Auction;
 

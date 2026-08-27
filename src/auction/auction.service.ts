@@ -40,11 +40,12 @@ export class AuctionService {
   }
 
   async findOne(id: string): Promise<Partial<AuctionResponseDto>> {
-    const auctionres = await this.auction.findBy({ id });
+    const auctionres = await this.auction.findOneBy({ id });
     if (!auctionres)
       throw new NotFoundException(`Auction with id ${id} not found`);
     const offers = await this.offer.find({ where: { auctionId: id } });
    // const auctionOffer: AuctionResponseDto = { ...auctionres, offers };
+   //auctionres.offers = offers; 
     return plainToInstance(AuctionResponseDto, { ...auctionres, offers });
   }
 
