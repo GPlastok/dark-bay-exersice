@@ -6,13 +6,18 @@ import {
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  LessThan,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { Auction } from './entities/auction.entity';
 import { Offer } from 'src/offer/entities/offer.entity';
-import { privateDecrypt } from 'crypto';
 import { AuctionResponseDto } from './dto/auction-response.dto';
 import { plainToInstance } from 'class-transformer';
-import { PaginationMeta, PaginationQueryDto } from 'src/common/dto/paging.dto';
+import { PaginationMeta } from 'src/common/dto/paging.dto';
+import { AuctionFilterDto } from './dto/auction-filter.dto';
 
 @Injectable()
 export class AuctionService {
@@ -36,13 +41,33 @@ export class AuctionService {
     return this.auction.save(auction);
   }
 
-  async findAll(paginationQueryDto: PaginationQueryDto): Promise<{
+  async findAll(auctionPaginatedFiltered: AuctionFilterDto): Promise<{
     data: AuctionResponseDto[];
     meta: PaginationMeta;
   }> {
-    const { page, limit } = paginationQueryDto;
+    const { page, limit, status, minPrice, maxPrice } =
+      auctionPaginatedFiltered;
 
     const [data, total] = await this.auction.findAndCount({
+      where: {
+        ...(status && status === 'open'
+          ? {
+              endDate: MoreThanOrEqual(new Date()),
+            }
+          : {
+              endDate: LessThan(new Date()),
+            }),
+        ...(minPrice
+          ? {
+              sellingPrice: MoreThanOrEqual(minPrice),
+            }
+          : {}),
+        ...(maxPrice
+          ? {
+              sellingPrice: LessThanOrEqual(maxPrice),
+            }
+          : {}),
+      },
       order: { endDate: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,

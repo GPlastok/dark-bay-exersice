@@ -15,6 +15,7 @@ import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
 import { AuctionResponseDto } from './dto/auction-response.dto';
 import { PaginationQueryDto } from 'src/common/dto/paging.dto';
+import { AuctionFilterDto } from './dto/auction-filter.dto';
 
 @Controller('auction')
 export class AuctionController {
@@ -26,7 +27,7 @@ export class AuctionController {
   }
 
   @Get()
-  findAll(@Query() paging: PaginationQueryDto) {
+  findAll(@Query() paging: AuctionFilterDto) {
     return this.auctionService.findAll(paging);
   }
 
