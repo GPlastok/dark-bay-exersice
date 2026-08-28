@@ -11,6 +11,7 @@ import { Offer } from './entities/offer.entity';
 import { Auction } from 'src/auction/entities/auction.entity';
 import { Repository } from 'typeorm';
 import { AuctionService } from 'src/auction/auction.service';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class OfferService {
@@ -20,6 +21,7 @@ export class OfferService {
     @InjectRepository(Auction)
     private readonly auctions: Repository<Auction>,
     private readonly auctionService: AuctionService,
+    private readonly dataSource: DataSource,
   ) {}
   //
 
@@ -45,16 +47,19 @@ export class OfferService {
       throw new ConflictException(
         `Your bid was lower than the current price and could not be placed. Please bid more than ${currentPrice}`,
       );
-    const offer = this.offers.create({ ...createOfferDto, bidderId });
-    const saved = await this.offers.save(offer);
+    await this.dataSource.transaction(async (transactionalEntityManager) => {
+      const offer = this.offers.create({ ...createOfferDto, bidderId });
+      const saved = await transactionalEntityManager.save(offer);
+      // const saved = await this.offers.save(offer);
 
-    if (saved.id) {
-      await this.auctionService.update(auction.id, {
-        currentPrice: offer.biddingPrice,
-      });
-    }
+      if (saved.id) {
+        await this.auctionService.update(auction.id, {
+          currentPrice: offer.biddingPrice,
+        });
+      }
 
-    return saved;
+      return saved;
+    });
   }
 
   findAll() {

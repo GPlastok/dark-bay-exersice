@@ -35,16 +35,17 @@ async function bootstrap() {
     .addTag('offers', 'Operations related to offers management')
     .addTag('authentication', 'Authentication Operations')
     .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'token',
+      // {
+      // type: 'http',
+      // scheme: 'bearer',
+      // bearerFormat: 'JWT',
+      // name: 'JWT',
+      // description: 'Enter JWT token',
+      // in: 'header',
+      // },
+      // 'token',
     )
+    .addSecurityRequirements('bearer')
     .build();
   const options: SwaggerDocumentOptions = {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
