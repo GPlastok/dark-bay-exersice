@@ -26,6 +26,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -54,6 +55,9 @@ export class AuctionController {
 
   @Public()
   @Get()
+  @ApiQuery({ name: 'status', required: false, enum: ['open', 'closed'] })
+  @ApiQuery({ name: 'minPrice', required: false, type: Number })
+  @ApiQuery({ name: 'maxPrice', required: false, type: Number })
   @ApiOperation({ summary: 'Get all auctions based on the filters' })
   @ApiOkResponse({ type: AuctionResponseDto })
   findAll(@Query() paging: AuctionFilterDto) {
