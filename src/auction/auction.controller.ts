@@ -14,7 +14,7 @@ import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
 
 import { AuctionFilterDto } from './dto/auction-filter.dto';
-
+import { Public } from 'src/auth/auth-jwt.guards';
 
 @Controller('auction')
 export class AuctionController {
@@ -25,6 +25,7 @@ export class AuctionController {
     return this.auctionService.create(createAuctionDto);
   }
 
+  @Public()
   @Get()
   findAll(@Query() paging: AuctionFilterDto) {
     return this.auctionService.findAll(paging);
