@@ -30,9 +30,10 @@ async function bootstrap() {
     .setTitle('Dark Bay API')
     .setDescription('Buy and sell stuff through an API. How cool is that?')
     .setVersion('1.0')
-    .addTag('users', 'Operations related to user management') // Define tag metadata
-    .addTag('auction', 'Operations related to auction management')
+    .addTag('users', 'Operations related to user management')
+    .addTag('auctions', 'Operations related to auction management')
     .addTag('offers', 'Operations related to offers management')
+    .addTag('authentication', 'Authentication Operations')
     .addBearerAuth(
       {
         type: 'http',
