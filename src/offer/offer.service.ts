@@ -47,19 +47,31 @@ export class OfferService {
       throw new ConflictException(
         `Your bid was lower than the current price and could not be placed. Please bid more than ${currentPrice}`,
       );
-    await this.dataSource.transaction(async (transactionalEntityManager) => {
-      const offer = this.offers.create({ ...createOfferDto, bidderId });
-      const saved = await transactionalEntityManager.save(offer);
-      // const saved = await this.offers.save(offer);
-
-      if (saved.id) {
-        await this.auctionService.update(auction.id, {
-          currentPrice: offer.biddingPrice,
+    return await this.dataSource.transaction(
+      async (transactionalEntityManager) => {
+        const offer = transactionalEntityManager.create(Offer, {
+          ...createOfferDto,
+          bidderId,
         });
-      }
+        const saved = await transactionalEntityManager.save(offer);
+        // const saved = await this.offers.save(offer);
 
-      return saved;
-    });
+        if (saved.id) {
+          const auctionupdated = await transactionalEntityManager.update(
+            Auction,
+            { id: auction.id },
+            {
+              currentPrice: offer.biddingPrice,
+            },
+          );
+          if (auctionupdated.affected == 0) {
+            throw new NotFoundException('Auction not found');
+          }
+        }
+
+        return saved;
+      },
+    );
   }
 
   findAll() {
