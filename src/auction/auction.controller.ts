@@ -6,15 +6,13 @@ import {
   Patch,
   Param,
   Delete,
-  SerializeOptions,
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
 import { AuctionService } from './auction.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
-import { AuctionResponseDto } from './dto/auction-response.dto';
-import { PaginationQueryDto } from 'src/common/dto/paging.dto';
+
 import { AuctionFilterDto } from './dto/auction-filter.dto';
 
 @Controller('auction')

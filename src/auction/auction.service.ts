@@ -54,9 +54,12 @@ export class AuctionService {
           ? {
               endDate: MoreThanOrEqual(new Date()),
             }
-          : {
+          : {}),
+        ...(status && status === 'closed'
+          ? {
               endDate: LessThan(new Date()),
-            }),
+            }
+          : {}),
         ...(minPrice
           ? {
               sellingPrice: MoreThanOrEqual(minPrice),
