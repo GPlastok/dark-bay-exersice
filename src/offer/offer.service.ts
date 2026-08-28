@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -31,6 +32,10 @@ export class OfferService {
       throw new NotFoundException(
         `Auction with id ${createOfferDto.auctionId} not found.`,
       );
+    if (auction.sellerId === bidderId)
+      throw new ForbiddenException(
+        'You are not allowed to bid your own auction',
+      );
     if (auction.endDate < new Date())
       throw new ConflictException('Auction is closed');
     const currentPrice = auction.currentPrice
@@ -57,7 +62,7 @@ export class OfferService {
   }
 
   findOne(id: string) {
-    return this.offers.findOneBy({id});
+    return this.offers.findOneBy({ id });
   }
 
   update(id: number, updateOfferDto: UpdateOfferDto) {

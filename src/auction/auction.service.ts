@@ -28,7 +28,7 @@ export class AuctionService {
     private readonly offer: Repository<Offer>,
   ) {}
 
-  create(createAuctionDto: CreateAuctionDto) {
+  create(createAuctionDto: CreateAuctionDto, userId: string) {
     if (createAuctionDto.endDate == undefined) {
       const date = new Date();
       createAuctionDto.endDate = date;
@@ -36,8 +36,11 @@ export class AuctionService {
     } else if (createAuctionDto.endDate < new Date()) {
       throw new ConflictException('invalid Date');
     }
-    const auction = this.auction.create(createAuctionDto);
-    auction.sellerId = 'e485262b-24b2-4f2f-a96e-575197330fc8';
+
+    const auction = this.auction.create({
+      ...createAuctionDto,
+      sellerId: userId,
+    });
     return this.auction.save(auction);
   }
 

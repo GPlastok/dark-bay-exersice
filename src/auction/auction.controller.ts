@@ -8,6 +8,7 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  Request
 } from '@nestjs/common';
 import { AuctionService } from './auction.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
@@ -21,8 +22,9 @@ export class AuctionController {
   constructor(private readonly auctionService: AuctionService) {}
 
   @Post()
-  create(@Body() createAuctionDto: CreateAuctionDto) {
-    return this.auctionService.create(createAuctionDto);
+  create(@Body() createAuctionDto: CreateAuctionDto,@Request() req) {
+
+    return this.auctionService.create(createAuctionDto,req.user.id);
   }
 
   @Public()
