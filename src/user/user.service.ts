@@ -23,6 +23,10 @@ export class UserService {
     return this.users.find();
   }
 
+  findOneByUsername(username: string) {
+    return this.users.findOne({ where: { username } });
+  }
+  
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
